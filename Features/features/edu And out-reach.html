@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Blood Donation Outreach & Education</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: Arial, sans-serif; margin:30px; background:#fafcff; }
+        .education { background:#f2f7fe; border-radius:8px; padding:18px; margin-bottom:20px;}
+        .title { font-size:1.6em; font-weight:600; margin-bottom:10px;}
+        .reminder { color:#d0122f; margin-top:10px;}
+        .social-buttons { margin-top:20px; }
+        .social-buttons button { margin:5px 8px; padding:10px 22px; border-radius:5px; border:none; cursor:pointer;}
+        .facebook { background:#4267B2; color:#fff; }
+        .twitter { background:#1DA1F2; color:#fff; }
+        .whatsapp { background:#25D366; color:#fff; }
+        .share-text { font-size:1.1em; margin-bottom:8px;}
+    </style>
+</head>
+<body>
+
+<div class="education">
+    <div class="title">Are You Eligible to Donate Blood?</div>
+    <ul>
+        <li>Be in good health and feeling well</li>
+        <li>Age between 18 and 65</li>
+        <li>Weight at least 50 kg (110 lbs)</li>
+        <li>Wait at least 3 months between donations</li>
+        <li>Check specific criteria for plasma, platelets, or Power Red donations</li>
+    </ul>
+    <div class="reminder">
+        Don't forget: Next donation eligible date is <span id="nextDonate">[Select below]</span>
+    </div>
+    <label for="lastDonate">Last donated on: </label>
+    <input type="date" id="lastDonate" onchange="showDate()" />
+</div>
+
+<div class="education">
+    <div class="title">Why Donate Blood?</div>
+    <p>Every two seconds, someone needs blood. Your donation can save lives in emergencies, surgeries, cancer care, and disasters.</p>
+</div>
+
+<div class="social-buttons">
+    <div class="share-text">Spread the word! Help save lives by sharing urgent blood needs:</div>
+    <button class="facebook" onclick="share('facebook')">Share on Facebook</button>
+    <button class="twitter" onclick="share('twitter')">Share on Twitter/X</button>
+    <button class="whatsapp" onclick="share('whatsapp')">Share on WhatsApp</button>
+</div>
+
+<script>
+function showDate() {
+    var last = document.getElementById('lastDonate').value;
+    if(last){
+        var date = new Date(last);
+        date.setMonth(date.getMonth() + 3); // 3 months wait
+        document.getElementById('nextDonate').textContent = date.toLocaleDateString();
+    }
+}
+
+// Social sharing function
+function share(platform){
+    var urgentMsg = encodeURIComponent(
+        "URGENT: Blood donors needed! Donate today and save lives. Learn more at [Your Website Link]"
+    );
+    var url = "";
+    if(platform === "facebook")
+        url = `https://www.facebook.com/sharer/sharer.php?u=[YourWebsiteLink]&quote=${urgentMsg}`;
+    if(platform === "twitter")
+        url = `https://twitter.com/intent/tweet?text=${urgentMsg}`;
+    if(platform === "whatsapp")
+        url = `https://wa.me/?text=${urgentMsg}`;
+    window.open(url, '_blank');
+}
+</script>
+</body>
+</html>

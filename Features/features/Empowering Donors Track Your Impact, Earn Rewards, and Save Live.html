@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Blood Donor Gamification & Dashboard</title>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; background:#f8f8fa; margin:0; }
+        .container { max-width:1200px; margin:40px auto; padding:24px; background:#fff; border-radius:8px; box-shadow:0 2px 8px #eee;}
+        .section { margin-bottom:38px;}
+        h2 { color:#d0122f; margin-bottom:16px;}
+        .leaderboard { margin-top:12px;}
+        .leaderboard th,.leaderboard td { border:1px solid #e0e0e0; padding:7px 14px;}
+        .leaderboard th { background:#f5f5fc;}
+        .badge { padding:6px 12px; background:#dfebdf; color:#2f7d21; border-radius:8px; margin-right:6px;}
+        .streak { color:#e09700; margin-left:14px;}
+        .rewards { margin-top:10px;}
+        .reward-item { background:#eaf2fb; border-radius:7px; padding:7px 13px; display:inline-block; margin-right:8px;}
+        .dashboard-cards { display:flex; gap:22px;}
+        .dashboard-card { background:#edfaed; border-radius:7px; padding:18px 22px; flex:1; min-width:160px; text-align:center;}
+        .dashboard-card h3 { margin:5px 0; color:#208620;}
+        .dashboard-card p { margin:0; font-size:1.3em;}
+        .health-impact { margin-top:14px; background:#fff5e2; border-radius:7px; padding:12px;}
+        .chatbot { margin-top:23px; background:#f2f2fc; padding:17px 28px; border-radius:16px; width:360px; }
+        .chatlog { min-height:85px; margin-bottom:9px;}
+        .bot,.user { margin-bottom:7px; }
+        .bot { color:#3a6ed2;}
+        .user { color:#d0122f;}
+        .chatbar input { width:70%; padding:7px; border-radius:7px;}
+        .chatbar button { padding:7px 18px; background:#e31937; color:#fff; border:none; border-radius:7px;}
+    </style>
+</head>
+<body>
+<div class="container">
+    
+    <!-- Gamification Section -->
+    <div class="section">
+        <h2>Gamification and Rewards</h2>
+        <div>
+            <span class="badge">Bloodscore: 450</span>
+            <span class="badge">Gold Badge</span>
+            <span class="streak">Streak: 7 consecutive donations!</span>
+        </div>
+        <div class="rewards">
+            <span class="reward-item">Free Health Checkup</span>
+            <span class="reward-item">Priority Appointment</span>
+            <span class="reward-item">Exclusive Donor T-Shirt</span>
+        </div>
+        <table class="leaderboard">
+            <tr>
+                <th>Rank</th><th>Name</th><th>Bloodscore</th><th>Badge</th><th>Streak</th>
+            </tr>
+            <tr>
+                <td>1</td><td>Amit</td><td>600</td><td>Platinum</td><td>12</td>
+            </tr>
+            <tr>
+                <td>2</td><td>Reena</td><td>530</td><td>Gold</td><td>9</td>
+            </tr>
+            <tr>
+                <td>3</td><td>You</td><td>450</td><td>Gold</td><td>7</td>
+            </tr>
+        </table>
+        <p class="rewards">* Complete monthly donation challenges to climb rankings and unlock new rewards!</p>
+    </div>
+
+    <!-- AI Chatbot/Assistant UI Simulation -->
+    <div class="section">
+        <h2>AI Chatbot Assistant</h2>
+        <div class="chatbot">
+            <div class="chatlog" id="chatlog">
+                <div class="bot">Hi! 👋 Need help with blood donation? I can answer your questions or help you book an appointment.</div>
+            </div>
+            <form class="chatbar" onsubmit="event.preventDefault();sendMsg();">
+                <input id="chatInput" type="text" placeholder="Type your question..." />
+                <button type="submit">Send</button>
+            </form>
+        </div>
+        <script>
+            function sendMsg() {
+                var input = document.getElementById("chatInput").value;
+                if(!input) return;
+                var log = document.getElementById("chatlog");
+                log.innerHTML += `<div class='user'>${input}</div>`;
+                setTimeout(() => {
+                    let reply = '';
+                    if(input.toLowerCase().includes('appointment')) reply = 'Sure! Your preferred date and time? I’ll get you scheduled.';
+                    else if(input.toLowerCase().includes('first time')) reply = 'Great! Blood donation is safe and easy. Do you want some tips or want to know about requirements?';
+                    else if(input.toLowerCase().includes('eligibility')) reply = 'You must be between 18 and 65 and weigh at least 50kg. More details available!';
+                    else reply = "I'm here for any doubts—ask away!";
+                    log.innerHTML += `<div class='bot'>${reply}</div>`;
+                }, 600);
+                document.getElementById("chatInput").value = '';
+            }
+        </script>
+    </div>
+
+    <!-- Personalized Dashboard Section -->
+    <div class="section">
+        <h2>Your Donor Dashboard</h2>
+        <div class="dashboard-cards">
+            <div class="dashboard-card">
+                <h3>Total Donations</h3>
+                <p>14</p>
+            </div>
+            <div class="dashboard-card">
+                <h3>Lives Saved</h3>
+                <p>37</p>
+            </div>
+            <div class="dashboard-card">
+                <h3>Next Eligible Date</h3>
+                <p>28 Nov 2025</p>
+            </div>
+        </div>
+        <div class="health-impact">
+            <strong>Health Impact:</strong> Regular donation can reduce the risk of certain diseases, improve cardiovascular health, and contribute to happier communities!
+            <br>
+            <em>Your donation has supported 3 cancer patients, 2 accident survivors, and contributed to local blood drives.</em>
+        </div>
+    </div>
+</div>
+</body>
+</html>

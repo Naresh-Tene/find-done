@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Blood Request - Patient to Donor</title>
+    <style>
+        body {font-family: Arial, sans-serif; background: #f7fafc;}
+        .container {max-width:420px; margin:70px auto; background:#fff; padding:32px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.07);}
+        label {font-weight:500; margin-top:18px;}
+        input, textarea {width:100%; padding:8px; margin-top:6px; margin-bottom:12px; border-radius:6px; border:1px solid #ddd;}
+        button {padding:10px 20px; background:#C72828; color:#fff; border:none; border-radius:6px; font-size:1em; cursor:pointer;}
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Blood Request - Patient to Donor</h2>
+    <form id="smsForm" onsubmit="sendBloodRequest(event)">
+        <label>Donor's Phone Number</label>
+        <input type="tel" id="donorPhone" placeholder="Donor mobile (+91...)" pattern="[0-9]{10,}" required>
+        <label>Patient Name</label>
+        <input type="text" id="patientName" placeholder="Patient name" required>
+        <label>Blood Group Needed</label>
+        <input type="text" id="bloodGroup" placeholder="e.g., A+, O-" required>
+        <label>Hospital / Location</label>
+        <input type="text" id="location" placeholder="Hospital/City" required>
+        <label>Additional Message (optional)</label>
+        <textarea id="message" placeholder="Any extra note"></textarea>
+        <button type="submit">Send Request</button>
+    </form>
+    <div id="response" style="margin-top:24px;"></div>
+</div>
+<script>
+async function sendBloodRequest(event) {
+    event.preventDefault();
+    const donorPhone = document.getElementById('donorPhone').value;
+    const patientName = document.getElementById('patientName').value;
+    const bloodGroup = document.getElementById('bloodGroup').value;
+    const location = document.getElementById('location').value;
+    const message = document.getElementById('message').value;
+    const smsText = `Urgent: Blood Needed!\nPatient: ${patientName}\nGroup: ${bloodGroup}\nLocation: ${location}\n${message}`;
+
+    const resBox = document.getElementById('response');
+    resBox.innerText = "Sending request...";
+    try {
+        const response = await fetch("http://localhost:3000/api/send-blood-sms", {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({ phone: donorPhone, message: smsText })
+        });
+        const data = await response.json();
+        if (data.success) {
+            resBox.innerText = "SMS Request Sent Successfully!";
+        } else {
+            resBox.innerText = "Error sending SMS: " + data.error;
+        }
+    } catch (e) {
+        resBox.innerText = "Network error: " + e.message;
+    }
+}
+</script>
+</body>
+</html>

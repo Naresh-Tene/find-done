@@ -1,0 +1,2 @@
+Smart Verification: Link donor health status with hospital records / Aarogya Setu-type health IDs
+Accessibility: Simple UI + support for regional languages + voice assistance. 

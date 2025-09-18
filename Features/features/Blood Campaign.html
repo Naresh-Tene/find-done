@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Blood Campaign – Save Lives Today</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; margin:0; background:#fff8fa; }
+    .header { background:#e31937; color: #fff; padding:28px 0; text-align:center; border-bottom-left-radius:22px; border-bottom-right-radius:22px;}
+    .header h1 { font-size:2.5em; font-weight:700; margin:0 0 10px;}
+    .header p { font-size:1.1em; margin:0; }
+    .notif-bar { background:#ffe2e5; color:#96000e; text-align:center; padding:13px 0; font-weight:600; letter-spacing:1px;}
+    .content { max-width:900px; margin:36px auto 0 auto; padding:0 16px;}
+    .section { margin-bottom:40px; }
+    .campaigns { display:grid; grid-template-columns:1fr 1fr 1fr; gap:26px;}
+    .campaign-card { background:#fff; border-radius:16px; box-shadow:0 2px 14px #f5c2c6; padding:14px 18px 21px; text-align:left;}
+    .campaign-card h3 { color:#d0122f; margin-bottom:9px;}
+    .cta-btn { display:inline-block; background:#e31937; color:#fff; padding:12px 27px; border-radius:8px; font-size:1.16em; font-weight:600; margin-top:17px; border:none; cursor:pointer; transition:background .2s;}
+    .cta-btn:hover { background:#91000a;}
+    .share-block { text-align:center; margin-top:18px;}
+    .share-btn { background:#f5f5f5; padding:10px 20px; border:none; border-radius:7px; margin-right:8px; cursor:pointer;}
+    .notif-center { background:#f6f7fc; border:1px solid #eed0db; border-radius:12px; padding:20px 28px; margin-bottom:24px;}
+    .notif-title { font-weight:600; font-size:1.35em; margin-bottom:8px;}
+    .notif-list { padding-left:16px; }
+    .notif-item { margin-bottom:6px; }
+    .leaflet-container { border-radius:13px; }
+    @media (max-width:900px) { .campaigns{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Blood Campaign 2025</h1>
+    <p>Together, every drop counts. Join our real-time drives and save lives!</p>
+  </div>
+  <div class="notif-bar" id="notifBar">
+    🚨 Urgent: O- blood donors needed near Delhi – Tap below and share!
+  </div>
+  <div class="content">
+
+    <!-- Proactive In-App Notification Center -->
+    <div class="notif-center">
+      <div class="notif-title">Notifications & Updates</div>
+      <div class="notif-list">
+        <div class="notif-item">🩸 Blood drive at Community Center - Sep 20, 10 AM-4 PM.</div>
+        <div class="notif-item">✅ New eligibility: Diabetics on oral medication <span style="color:#26b727;">can now donate!</span></div>
+        <div class="notif-item">🦺 Safety Update: All donors get on-site health screening & digital certificates!</div>
+      </div>
+    </div>
+    
+    <!-- Campaigns Section -->
+    <div class="section">
+      <h2 style="color:#bc1832;">Live & Upcoming Drives</h2>
+      <div class="campaigns">
+        <div class="campaign-card">
+          <h3>Red Hope Blood Marathon</h3>
+          <p><b>Where:</b> City Mall, Main Hall</p>
+          <p><b>When:</b> Sep 20, 9AM-6PM</p>
+          <p><b>Goal:</b> 200+ Donors</p>
+          <button class="cta-btn" onclick="alert('Registered! See you there!')">Register</button>
+        </div>
+        <div class="campaign-card">
+          <h3>Mobile Blood Van</h3>
+          <p><b>Where:</b> University Campus Gate 1</p>
+          <p><b>When:</b> Sep 21, 11AM-3PM</p>
+          <p><b>Goal:</b> Collect 75 Units</p>
+          <button class="cta-btn" onclick="alert('Registered!')">Book a Slot</button>
+        </div>
+        <div class="campaign-card">
+          <h3>Night Donor Challenge</h3>
+          <p><b>Where:</b> City Hospital</p>
+          <p><b>When:</b> Sep 22, 7PM-11PM</p>
+          <p><b>Goal:</b> 50 Night Donations</p>
+          <button class="cta-btn" onclick="alert('Registered for Night Challenge!')">Join Challenge</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Social Media Campaign Block -->
+    <div class="section share-block">
+      <div style="font-size:1.25em; margin-bottom:7px;">Share & Amplify</div>
+      <button class="share-btn" onclick="shareCampaign('facebook')">Share on Facebook</button>
+      <button class="share-btn" onclick="shareCampaign('twitter')">Share on Twitter/X</button>
+      <button class="share-btn" onclick="shareCampaign('whatsapp')">Share on WhatsApp</button>
+    </div>
+    
+    <!-- Map: Show Drives or Nearest Hospital -->
+    <div class="section">
+      <h2 style="color:#bc1832;">Donation Locations Map</h2>
+      <div id="map" style="height:320px;width:100%;"></div>
+    </div>
+  </div>
+  
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // Map setup
+    const drives = [
+      {name:"Red Hope Blood Marathon",lat:28.6152,lon:77.2177},
+      {name:"Mobile Blood Van",lat:28.5841,lon:77.1635},
+      {name:"Night Donor Challenge",lat:28.5663,lon:77.2104}
+    ];
+    const map = L.map('map').setView([28.61, 77.20], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+    drives.forEach(d=>
+      L.marker([d.lat,d.lon]).addTo(map)
+        .bindPopup(`<b>${d.name}</b>`)
+    );
+
+    // Social sharing functions
+    function shareCampaign(platform){
+      const text = encodeURIComponent("Join me at the Blood Campaign – Save lives, donate, and share! Check out the next blood drive at bloodcampaign2025.org");
+      let url="";
+      if(platform==="facebook")
+        url=`https://www.facebook.com/sharer/sharer.php?u=https://bloodcampaign2025.org&quote=${text}`;
+      if(platform==="twitter")
+        url=`https://twitter.com/intent/tweet?text=${text}`;
+      if(platform==="whatsapp")
+        url=`https://wa.me/?text=${text}`;
+      window.open(url,'_blank');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Live Blood Inventory Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f3f7fd; margin: 0; padding: 0; }
+        header { background: #C72828; color: #fff; padding: 30px 0; text-align: center; }
+        .container { max-width: 900px; margin: 40px auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.10); padding: 30px; }
+        h2 { margin-bottom: 8px; }
+        #timestamp { color: #444; font-size: 0.95em; margin-bottom: 14px; }
+        .filters { display: flex; gap: 10px; margin-bottom: 20px; }
+        .filters select, .filters input { padding: 7px; font-size: 1em; border-radius: 4px; border: 1px solid #ddd; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 18px; }
+        th, td { border: 1px solid #ddd; padding: 14px; text-align: center; }
+        th { background: #FFF3F3; color: #C72828; }
+        .status-low { color: #e53e3e; font-weight: bold; }
+        .status-normal { color: #246b34; font-weight: 500;}
+        .status-high { color: #38a169; font-weight: bold;}
+        tr.selected { background: #e6f4ff; }
+        .contact-btn, .request-btn, .map-btn { padding: 7px 18px; border: none; border-radius: 5px; cursor: pointer; color: #fff; font-size: 1em; }
+        .contact-btn { background: #2186eb; margin-right: 6px;}
+        .request-btn { background: #ef4444; margin-right: 6px;}
+        .map-btn { background: #38a169; }
+        #map-section { display: none; margin-bottom: 24px; text-align: center; }
+        #close-map { background: #C72828; color: #fff; border: none; border-radius: 4px; padding: 4px 12px; cursor: pointer; margin: 10px 0;}
+        @media (max-width: 700px) {
+            .container { padding: 10px; }
+            th, td { font-size: 0.95em; padding: 7px;}
+            .filters { flex-direction: column; }
+        }
+    </style>
+    <script>
+        // Demo blood inventory
+        let inventory = [
+            { hospital: "Apollo", location: "Chennai", bloodGroup: "O+", units: 2, contact: "044-123456", lastUpdated: "2025-09-17 16:52", map: "Chennai,India" },
+            { hospital: "MaxCare", location: "Delhi", bloodGroup: "A+", units: 12, contact: "011-654321", lastUpdated: "2025-09-17 16:53", map: "Delhi,India" },
+            { hospital: "City Blood Bank", location: "Mumbai", bloodGroup: "B-", units: 0, contact: "022-876543", lastUpdated: "2025-09-17 16:54", map: "Mumbai,India" }
+        ];
+
+        function renderTable() {
+            const tbody = document.getElementById('inventory-body');
+            tbody.innerHTML = '';
+            let selectedBg = document.getElementById('filter-bg').value;
+            let selectedLoc = document.getElementById('filter-loc').value;
+            const filtered = inventory.filter(item =>
+                (selectedBg === "" || item.bloodGroup === selectedBg) &&
+                (selectedLoc === "" || item.location.toLowerCase().includes(selectedLoc.toLowerCase()))
+            );
+            filtered.forEach((item, idx) => {
+                let statusClass = item.units === 0 ? 'status-low' : item.units < 5 ? 'status-normal' : 'status-high';
+                let statusText = item.units === 0 ? 'Out of Stock' : item.units < 5 ? `Low (${item.units})` : `Available (${item.units})`;
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${item.hospital}</td>
+                        <td>${item.location}</td>
+                        <td>${item.bloodGroup}</td>
+                        <td class="${statusClass}">${statusText}</td>
+                        <td>${item.lastUpdated}</td>
+                        <td>
+                            <button class="contact-btn" onclick="window.location.href='tel:${item.contact}'">Contact</button>
+                            <button class="request-btn" onclick="requestBlood('${item.hospital}', '${item.bloodGroup}')">Request</button>
+                            <button class="map-btn" onclick="showMap('${item.map}', '${item.hospital}', '${item.location}')">View on Map</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            document.getElementById('timestamp').innerText = `Last updated: ${new Date().toLocaleString()}`;
+        }
+
+        function requestBlood(hospital, bloodGroup) {
+            alert(`Emergency request sent to ${hospital} for ${bloodGroup}.`);
+        }
+
+        function showMap(location, hospital, city) {
+            const mapSection = document.getElementById('map-section');
+            mapSection.innerHTML = `
+                <button id="close-map" onclick="closeMap()">Close Map</button>
+                <h3>${hospital} (${city})</h3>
+                <iframe width="98%" height="320" frameborder="0" style="border-radius:10px;border:1px solid #ccc;"
+                    src="https://www.google.com/maps?q=${encodeURIComponent(location)}&output=embed"></iframe>
+            `;
+            mapSection.style.display = 'block';
+            window.scrollTo({ top: mapSection.offsetTop - 32, behavior: "smooth" });
+        }
+
+        function closeMap() {
+            document.getElementById('map-section').style.display = 'none';
+        }
+
+        window.onload = renderTable;
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Live Blood Inventory Tracker</h1>
+        <p>Empowering urgent, data-driven blood requests for every city</p>
+    </header>
+    <div class="container">
+        <div id="map-section"></div>
+        <h2>Available Blood Stocks</h2>
+        <div id="timestamp"></div>
+        <div class="filters">
+            <select id="filter-bg" onchange="renderTable()">
+                <option value="">All Blood Groups</option>
+                <option value="A+">A+</option>
+                <option value="B+">B+</option>
+                <option value="O+">O+</option>
+                <option value="AB+">AB+</option>
+                <option value="A-">A-</option>
+                <option value="B-">B-</option>
+                <option value="O-">O-</option>
+                <option value="AB-">AB-</option>
+            </select>
+            <input id="filter-loc" type="text" placeholder="Filter by city/location" onkeyup="renderTable()" />
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Hospital</th>
+                    <th>Location</th>
+                    <th>Blood Group</th>
+                    <th>Status</th>
+                    <th>Last Updated</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="inventory-body">
+                <!-- Live rows here -->
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

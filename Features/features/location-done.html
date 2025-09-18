@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Donor-Hospital Routing by Place Name</title>
+  <meta charset="UTF-8"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f9f9fb;}
+    #map { height: 70vh; width: 100%; margin-top:20px;}
+    .info { text-align:center; font-size:1.1em; margin:14px;}
+    .controls { text-align:center; margin-bottom:16px; }
+    .search-box { display:inline-block; margin:0 14px;}
+    .search-box input {width:220px; margin:2px 4px; padding:6px; border-radius:6px; border:1px solid #ddd;}
+    button {padding:8px 15px; border:none; border-radius:7px; margin:8px 8px; background:#e01837; color:#fff; font-weight:600;}
+    label {margin-right:2px;}
+  </style>
+</head>
+<body>
+  <div class="info">
+    <strong>Type Donor & Hospital Locations (by Place/Name)</strong><br>
+    <small>Enter city, hospital, or place name and click Set. Route will use live map!</small>
+  </div>
+  <div class="controls">
+    <div class="search-box">
+      <label>Donor Location</label>
+      <input type="text" id="donorPlace" placeholder="e.g. Connaught Place"/>
+      <button onclick="setDonor()">Set Donor</button>
+    </div>
+    <div class="search-box">
+      <label>Hospital Location</label>
+      <input type="text" id="hospitalPlace" placeholder="e.g. AIIMS Delhi"/>
+      <button onclick="setHospital()">Set Hospital</button>
+    </div>
+    <button onclick="findRoute()">🛣️ Get Route</button>
+  </div>
+  <div id="map"></div>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    let donorCoords = [28.6139, 77.2090];
+    let hospitalCoords = [28.5677, 77.2100];
+    const map = L.map('map').setView(donorCoords, 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Markers
+    let donorMarker = L.marker(donorCoords, {draggable:false}).addTo(map).bindPopup('Donor').openPopup();
+    let hospitalMarker = L.marker(hospitalCoords).addTo(map).bindPopup('Hospital').openPopup();
+    let routeLine, orsRoute;
+
+    function drawLine(from, to){
+      if(routeLine) map.removeLayer(routeLine);
+      routeLine = L.polyline([from, to], {color:'red', weight:4, dashArray:'6 6'}).addTo(map);
+    }
+    drawLine(donorCoords, hospitalCoords);
+
+    // Geocode location name using Nominatim
+    function geocode(place, callback) {
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(place)}`)
+        .then(resp => resp.json())
+        .then(data => {
+          if (data && data.length > 0) {
+            callback([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
+          } else {
+            alert("Location not found!");
+          }
+        })
+        .catch(() => alert("Failed to search the location!"));
+    }
+
+    function setDonor() {
+      const place = document.getElementById('donorPlace').value;
+      if (!place) return alert("Please type a donor location name.");
+      geocode(place, function(coords){
+        donorCoords = coords;
+        donorMarker.setLatLng(coords);
+        map.panTo(coords);
+        drawLine(donorCoords, hospitalCoords);
+      });
+    }
+
+    function setHospital() {
+      const place = document.getElementById('hospitalPlace').value;
+      if (!place) return alert("Please type a hospital location name.");
+      geocode(place, function(coords){
+        hospitalCoords = coords;
+        hospitalMarker.setLatLng(coords);
+        map.panTo(coords);
+        drawLine(donorCoords, hospitalCoords);
+      });
+    }
+
+    // Live driving route (OpenRouteService)
+    function findRoute() {
+      const apiKey = "API-KEY-PLACEED-HERE";
+      fetch(`https://api.openrouteservice.org/v2/directions/driving-car?api_key=${apiKey}&start=${donorCoords[1]},${donorCoords[0]}&end=${hospitalCoords[1]},${hospitalCoords[0]}`)
+        .then(resp => resp.json())
+        .then(data => {
+          if(orsRoute) map.removeLayer(orsRoute);
+          const coords = data.features[0].geometry.coordinates.map(c => [c[1], c[0]]);
+          orsRoute = L.polyline(coords, {color:'#0b6fdf', weight:6}).addTo(map);
+          map.fitBounds(L.latLngBounds(coords));
+        })
+        .catch(() => alert('Route not found!'));
+    }
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+<!-- stats https://account.heigit.org/manage/key -->
